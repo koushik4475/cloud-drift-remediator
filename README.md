@@ -1,3 +1,8 @@
+# Cloud Drift Remediator | Multi-Cloud Infrastructure Drift Detection in Go
+
+Cloud Drift Remediator is a Go command-line project for detecting configuration drift across cloud infrastructure. Its documented workflow scans infrastructure state, reports changes, exports SARIF results, and supports guarded or dry-run remediation across AWS, Google Cloud, and Azure environments. It is intended for cloud engineers and platform teams building infrastructure-governance workflows; review every proposed change before applying remediation.
+
+
 <div align="center">
 
 ```
@@ -125,10 +130,7 @@ flowchart TD
 ### Via Source (Go 1.22+)
 
 ```bash
-# Cloud Drift Remediator | Multi-Cloud Infrastructure Drift Detection in Go
-
-Cloud Drift Remediator is a Go command-line project for detecting configuration drift across cloud infrastructure. Its documented workflow scans infrastructure state, reports changes, exports SARIF results, and supports guarded or dry-run remediation across AWS, Google Cloud, and Azure environments. It is intended for cloud engineers and platform teams building infrastructure-governance workflows; review every proposed change before applying remediation.
-
+# Clone the repository
 git clone https://github.com/ER-brocode/cloud-drift-remediator.git
 cd cloud-drift-remediator
 
