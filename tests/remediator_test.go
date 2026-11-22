@@ -149,6 +149,36 @@ func TestRemediator_LiveExecutionAndRollback(t *testing.T) {
 	}
 }
 
+func TestExecutor_CancellationMarksQueuedStepsFailed(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	plan := &model.RemediationPlan{
+		PlanID: "cancelled-plan",
+		Steps: []*model.RemediationStep{
+			{StepID: "step-1", Action: model.ActionUpdate},
+			{StepID: "step-2", Action: model.ActionUpdate},
+			{StepID: "step-3", Action: model.ActionUpdate},
+		},
+	}
+	executor := remediator.NewExecutor(nil, nil, &remediator.ExecutorOptions{
+		MaxConcurrentWorkers: 2,
+	})
+
+	if err := executor.Execute(ctx, plan); err == nil {
+		t.Fatal("expected cancellation to be reported as an execution error")
+	}
+
+	for _, step := range plan.Steps {
+		if step.Status != model.StatusFailed {
+			t.Errorf("step %s status = %s, want %s", step.StepID, step.Status, model.StatusFailed)
+		}
+		if step.ErrorMessage != context.Canceled.Error() {
+			t.Errorf("step %s error = %q, want %q", step.StepID, step.ErrorMessage, context.Canceled.Error())
+		}
+	}
+}
+
 func TestRemediator_DryRunDoesNotMutate(t *testing.T) {
 	ctx := context.Background()
 
