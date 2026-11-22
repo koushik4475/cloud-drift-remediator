@@ -105,9 +105,15 @@ func (e *Executor) Execute(ctx context.Context, plan *model.RemediationPlan) err
 			for step := range stepChan {
 				select {
 				case <-ctx.Done():
+					cancelErr := ctx.Err()
 					step.Status = model.StatusFailed
-					step.ErrorMessage = ctx.Err().Error()
-					return
+					step.ErrorMessage = cancelErr.Error()
+					errMu.Lock()
+					executionErrors = append(executionErrors, fmt.Errorf("step %s cancelled: %w", step.StepID, cancelErr))
+					errMu.Unlock()
+					// Keep draining the queue so every unstarted step gets a
+					// terminal status instead of being left pending.
+					continue
 				default:
 				}
 
